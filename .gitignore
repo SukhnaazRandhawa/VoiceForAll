@@ -19,3 +19,22 @@ Thumbs.db
 *.h5
 *.mp4
 *.avi
+
+# Dataset files (too large for Git)
+data/wlasl_raw/*.mp4
+data/wlasl_raw/*.avi
+data/processed/*.npy
+data/processed/*.npz
+data/processed/*.h5
+
+# Keep directory structure but ignore large files
+*.mp4
+*.avi
+*.npy
+*.npz
+*.h5
+*.pkl
+
+# But keep the JSON metadata (small files)
+!data/*.json
+!data/*.txt
