@@ -1,0 +1,37 @@
+Pre Meeting Report => 
+
+Progress Since Last Meeting:
+
+I have completed a literature review of recent sign language recognition systems and identified three implementation 
+approaches: (1) Isolated Recognition - one sign per recording (89-97% accuracy but poor UX), 
+(2) Pause-Based Continuous - multiple signs with pauses in one recording, with automatic segmentation, 
+and (3) True Continuous - natural signing without pauses (state-of-the-art research problem, 
+60-70% accuracy, high computational cost).
+
+I think I should go for Option 2 (Pause-Based Continuous Recognition) as it balances usability with technical feasibility. 
+Users click START, perform multiple signs with brief pauses, then click STOP. 
+The system automatically detects pauses via hand velocity thresholds and segments the video for recognition. 
+This approach achieves a natural user experience (one recording session) while maintaining high accuracy 
+(target: 75-85%), builds upon proven methods with a novel segmentation contribution, and aligns with commercial 
+systems like Google SignAll.
+
+Technical Implementation for Option 2: 
+Feature Extraction: MediaPipe Holistic (75 keypoints → 225D feature vectors per frame)
+Recognition Model: Hybrid LSTM-GRU network (89.5% baseline accuracy)
+Pause Detection: Frame-to-frame hand velocity algorithm with empirical threshold
+Stack: Python 3.8+, TensorFlow/Keras, OpenCV, NumPy
+Dataset: WLASL (50-word vocabulary for proof-of-concept)
+
+Next Steps for This Week:
+Set up the environment and verify the MediaPipe feature extraction
+
+Question for Discussion:
+Do you think Option 2 is good enough? Or do you recommend going for Option 3?
+
+
+
+
+Post Meeting Notes =>
+
+Last Friday, my plan for option 2 was approved, which was this one (Pause-Based Continuous - multiple signs 
+with pauses in one recording, with automatic segmentation). And I was told to commit all the weekly reports to GitLab.

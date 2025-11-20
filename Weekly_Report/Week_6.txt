@@ -1,0 +1,29 @@
+Pre Meeting Notes => 
+
+What I achieved since our last meeting:
+
+Following our discussion on Option 2 (Pause-Based Continuous Recognition), I have completed the initial 
+technical setup and validation =>
+Development Environment: Configured Python 3.8 with virtual environment and installed core dependencies 
+(MediaPipe,    TensorFlow/Keras, OpenCV, NumPy)
+MediaPipe Integration: Successfully tested MediaPipe Holistic for feature extraction. 
+Verified extraction of 75 keypoints     
+(21 per hand + 33 pose landmarks) yielding 225-dimensional feature vectors per frame through webcam testing.
+Feature Extraction Pipeline: Implemented and validated the feature extraction function that converts 
+video frames into numerical representations suitable for LSTM input. Confirmed output shape (225,) per frame.
+
+Current Status - Dataset Acquisition:
+I have identified two approaches for obtaining the WLASL dataset: Method 1 uses pre-processed datasets from 
+Kaggle/Roboflow with videos already downloaded (1-3 hours download time), while Method 2 requires downloading 
+videos individually from YouTube using the official GitHub repository (3-4 days with ~20-30% failure rate). 
+I am proceeding with Method 1 (Kaggle WLASL-100 subset) as it provides faster iteration, eliminates YouTube availability issues, and offers sufficient scope with 100 words (~2,000 labeled videos) for proof-of-concept development. This can be scaled to larger subsets after pipeline validation.
+
+Targets for Next Week:
+Complete WLASL dataset download (100-word subset for initial development)
+Process downloaded videos with MediaPipe to extract features from all samples
+Create training dataset: X (features) and y (labels) in an appropriate format
+Begin LSTM model architecture implementation
+
+Questions for Discussion:
+GPU Access: For next week's target of processing 2,000 videos with MediaPipe (Step 2), GPU acceleration would significantly reduce processing time from 8-12 hours (CPU only) to 2-3 hours. Would it be possible to arrange access to university GPU resources for the coming week?
+Does the 100-word subset scope align with project expectations, or should I commit to the full 2,000-word dataset from the start?

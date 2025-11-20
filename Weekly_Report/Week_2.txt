@@ -1,0 +1,43 @@
+Pre-Meeting Report
+
+Since last week, I have finalized my project idea, which is a bidirectional AI-powered
+sign language translation system focusing on American Sign Language (ASL) and British 
+Sign Language (BSL) using cross-linguistic transfer learning. 
+I also conducted a detailed feasibility analysis: I confirmed access 
+to the WLASL dataset (21,083 ASL videos covering 2,000 signs), explored BSL data 
+sources such as the BSL Corpus and BSL SignBank, and estimated that around 5,000–8,000 
+BSL videos covering 500–1,000 signs are usable. This highlighted a significant data 
+disparity between ASL and BSL, which I plan to turn into a research opportunity by 
+exploring how transfer learning can help bridge this gap.
+
+For tomorrow’s meeting, I would like to discuss my implementation 
+strategy and confirm if the proposed staged approach is appropriate. 
+My plan is to start with ASL (the high-resource language) to develop a complete 
+working system, and then extend to BSL (the low-resource language) using transfer 
+learning techniques. This approach ensures that I have a functional prototype early 
+on while managing the risk associated with limited data availability.
+
+In terms of research contribution, I intend to focus on the ASL–BSL data imbalance 
+as my core research direction. The goal is to demonstrate how models trained on 
+high-resource sign languages can support the development of systems for low-resource ones, 
+and potentially generalize this method to other underrepresented sign languages worldwide.
+Finally, I would like to confirm whether I am free to choose any tech stack for the 
+implementation, or if there are any recommended frameworks or technologies that I should 
+follow.
+
+
+
+Post-Meeting Report
+
+In today’s meeting, I discussed whether I can begin working on my project and 
+if there are any specific tech stack requirements. 
+It was confirmed that I am free to choose the technologies I prefer for implementation.
+
+We also reviewed the project plan and concluded that I should start with 
+ASL (American Sign Language) first, as it has the largest amount of data and 
+available resources. If time permits later, I can extend the system to 
+include BSL (British Sign Language), as it is a lower-resource language.
+
+Finally, we discussed the project's complexity in relation to the degree 
+requirements, and it was agreed that the project has sufficient depth and 
+potential complexity to meet the expectations for my program.

@@ -1,0 +1,45 @@
+Pre-Meeting Report
+
+What I have achieved since our previous meeting:
+This week, I finalized the project scope and technical approach for 
+my Bidirectional AI-Powered Sign Language Translation System. After reviewing multiple 
+implementation strategies, I have decided to follow a phased approach—starting with 
+unidirectional sign-to-text recognition for American Sign Language (ASL) before extending 
+to British Sign Language (BSL) and full bidirectional translation.
+
+I have completed a focused literature review and studied three key research papers 
+that inform my technical design:
+=>  Gaikwad & Admuthe (2024), “Sign Language Recognition of Words and Sentence 
+Prediction Using LSTM and NLP” —    presents a MediaPipe + LSTM approach 
+achieving 97.53% accuracy.
+
+=> Uddin et al. (2025), “Real-Time Norwegian Sign Language Recognition Using MediaPipe 
+and LSTM” — introduces methods applicable to low-resource sign languages 
+like BSL, achieving 95% accuracy.
+
+=> A third paper analyzing hybrid LSTM-GRU architectures for temporal sequence modeling.
+
+Through these, I have gained the theoretical grounding required to begin implementation. 
+My next step will be environment setup and dataset preprocessing for ASL recognition.
+
+Points of discussion for the meeting:
+GitLab content: Should I commit all materials 
+(e.g., literature PDFs, reading summaries, and planning documents) 
+or focus mainly on code and technical deliverables?
+
+Do I have access to GPU resources for model training, 
+or should I plan for Google Colab/cloud alternatives? It will be much better 
+if I have access to a GPU.                
+For model training, I understand I'll need GPU access since training LSTM models on 
+CPU would take 20-40 hours per run, which isn't practical for iterative development. 
+Does the university provide GPU compute resources that I can access for this project? 
+If not available, I plan to use Google Colab's free tier 
+(12-hour session limits, sufficient for 2-4 hour training runs).
+
+
+
+
+Post Meeting Report =>
+
+Last Friday, we discussed whether I also need to commit the research papers 
+to GitLab or not. I asked if I had access to GPU resources or not.

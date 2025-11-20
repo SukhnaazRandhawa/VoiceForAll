@@ -1,0 +1,33 @@
+Pre Meeting Report => 
+
+What I achieved since our last meeting : 
+
+Last week, I completed reading several research papers that covered static (isolated) sign language recognition. 
+These papers focused on recognizing individual signs in isolation, where each sign is performed separately with 
+clear start and end boundaries. The approaches primarily used MediaPipe for hand and pose keypoint extraction, 
+combined with LSTM/GRU architectures for classification. This gave me a solid foundation in understanding the fundamental 
+techniques for sign recognition.
+
+I am now moving forward with reading new research papers that cover continuous sign language recognition. 
+This is more challenging as it involves recognizing signs from continuous signing sequences without clear boundaries 
+between signs—similar to how we speak in natural sentences. I'm particularly focusing on papers that discuss CTC-based 
+approaches, sequence-to-sequence models, and transformer architectures for handling continuous signing.
+
+Points of discussion for the meeting : 
+
+My goal is to create a system that continuously records the user's signing and predicts complete sentences using 
+NLP techniques, similar to natural conversation flow. So far, the research papers I have read primarily focus 
+on static/isolated sign detection with relatively small vocabularies of around 100 signs or less. 
+However, moving to continuous sign language recognition represents a significant jump in complexity, 
+as it requires handling temporal sequences, sign boundaries, and larger vocabularies. 
+Therefore, I am currently reading multiple research papers specifically focused on continuous sign language 
+recognition to better understand the approaches, datasets, and architectures needed for this more challenging task. 
+
+
+
+
+Post Meeting Report => 
+
+Last Friday, we discussed that there is very little research available on real-time sign-to-speech translation. 
+There are still several challenges that need to be addressed, and there’s a significant gap in this area. 
+Therefore, I should consider reducing the complexity and focusing on a more feasible approach.
