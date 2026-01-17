@@ -38,3 +38,6 @@ data/processed/*.h5
 # But keep the JSON metadata (small files)
 !data/*.json
 !data/*.txt
+
+#Database
+wlasl_data.zip

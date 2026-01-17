@@ -1,0 +1,14 @@
+What I Completed in last few days:
+* Accessed the university GPU through JupyterLab (UG Project 2025-26 environment)
+* Uploaded my dataset to the GPU environment
+* Ran MediaPipe processing on all 21,095 videos
+* Successfully extracted features from the dataset
+The processing produced three files:
+* X_wlasl2000.npy -> shape (21,083, 40, 225) containing the extracted features
+* y_wlasl2000.npy -> shape (21,083,) containing the word labels
+* label_map.npy -> containing all 2,000 ASL words
+Each video was processed to extract 40 frames, with 225 features per frame (hand and pose landmarks). Only 12 videos were skipped due to corruption, which is negligible.
+Tomorrow's Plan:
+* Download the processed files from the university server
+* Begin LSTM model training using the extracted features
+* The LSTM will learn to recognise sign language patterns from the sequential hand/body movement data
