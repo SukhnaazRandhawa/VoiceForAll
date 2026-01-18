@@ -1,0 +1,34 @@
+Today's progress. I have successfully completed the LSTM model training phase and achieved working sign language recognition.
+What I Accomplished Today:
+1. Accessed University GPU Environment
+    * Used JupyterLab GPU (UG Project 2025-26) with Tesla T4 GPU
+    * Uploaded processed dataset (21,083 videos, 2,000 words)
+2. Initial Training Attempt (2,000 words)
+    * Built LSTM model with two LSTM layers (256 and 128 units)
+    * Result: Only 0.36% accuracy
+    * Reason: Insufficient data per word (average 10 videos per word)
+3. Data Analysis
+    * Analysed distribution of videos across words
+    * Found that 964 words (nearly half) have fewer than 10 videos
+    * Only 51 words have 20+ videos
+4. Refined Approach (Top 20 words)
+    * Filtered dataset to top 20 words with most training data
+    * Applied data normalisation
+    * Words included: book, drink, computer, before, chair, go, clothes, who, candy, cousin, deaf, fine, help, no, thin, walk, year, yes, all, black
+5. Final Results
+    * Test Accuracy: 47% (random guess would be 5%)
+    * Training Accuracy: 64% approx
+    * Sample predictions showed 7/10 correct (70%)
+    * High confidence predictions: "chair" (95.7%), "book" (90.9%)
+Key Findings:
+* The WLASL dataset has limited samples per word, which affects model performance
+* Focusing on words with more training data significantly improves accuracy
+* The model successfully learned to distinguish between different signs
+Tomorrow's Plan:
+* Build web interface to test the model with real-time webcam input
+* Test if the model can recognise my own signing. I want to see if things actually work as expected for these 20 words. 
+* Validate the complete pipeline: Webcam → MediaPipe → Model → Speech output
+Future Improvements:
+* Expand vocabulary using data augmentation techniques
+* Add pause detection for sentence-building feature
+* Test with BSL data for cross-linguistic transfer learning
