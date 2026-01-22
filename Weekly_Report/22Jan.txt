@@ -1,0 +1,29 @@
+I have completed the web application testing and identified important limitations that have informed a revised approach.
+What I Completed Since Last Report:
+1. Web Application Built and Tested
+    * Created a real-time sign language recognition app running on my MacBook
+    * The app captures webcam input, extracts MediaPipe landmarks, and displays predictions live
+    * Successfully validated the complete pipeline: Webcam → MediaPipe → Model → Prediction
+2. Real-World Testing Results
+    * Some signs are recognised correctly with high confidence (e.g., "chair", "book")
+    * However, signs with similar starting motions cause confusion
+    * For example: When signing "book" (fold hands then open), the model incorrectly predicts "help" during the folding motion
+    * Confidence levels varied significantly (30-95%)
+Key Insight:
+The LSTM architecture processes frames sequentially and struggles with long-term temporal dependencies. It cannot "see" the complete gesture before making predictions, causing confusion between signs that share similar intermediate positions.
+Revised Strategy for Remaining 14 Weeks:
+After researching this limitation, I am implementing a hybrid approach:
+Phase 1: Improve Base Model 
+* Implement data augmentation to increase training samples
+* Build a Transformer-based model using attention mechanisms to analyse gestures globally rather than sequentially
+* Compare LSTM vs Transformer on augmented data
+* Target: Improve accuracy from 47% to 70%+
+Phase 2: Transfer Learning 
+* Apply the better-performing model to BSL data
+* Analyse which signs transfer between ASL and BSL
+* This aligns with my original proposal on cross-linguistic transfer learning
+
+Why This Change:
+Transfer learning requires a strong source model. At 47% accuracy, the current model lacks sufficient knowledge to transfer meaningfully. Improving the base model first will make the transfer learning experiments more valuable.
+Tommarow I will start:
+* Data augmentation script
