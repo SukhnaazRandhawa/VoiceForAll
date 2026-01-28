@@ -1,4 +1,3 @@
-# scripts/retrain_local.py
 # Retrain the model locally on MacBook
 
 import numpy as np
