@@ -142,12 +142,15 @@ print("=" * 60)
 # Load model and parameters
 print("\n Loading model...")
 #model = keras.models.load_model('models/lstm_augmented.keras')
-model = keras.models.load_model('models/lstm_proper.keras')
+#model = keras.models.load_model('models/lstm_proper.keras')
+model = keras.models.load_model('models/transformer.keras')
 words = np.load('models/top_20_words.npy', allow_pickle=True)
 #norm_mean = np.load('models/norm_mean_aug.npy')
-norm_mean = np.load('models/norm_mean_proper.npy')
+#norm_mean = np.load('models/norm_mean_proper.npy')
+norm_mean = np.load('models/norm_mean_transformer.npy')
 #norm_std = np.load('models/norm_std_aug.npy')
-norm_std = np.load('models/norm_std_proper.npy')
+#norm_std = np.load('models/norm_std_proper.npy')
+norm_std = np.load('models/norm_std_transformer.npy')
 print(f" Model loaded - {len(words)} words")
 
 # Initialize MediaPipe
