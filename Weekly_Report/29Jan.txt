@@ -1,0 +1,30 @@
+Following on from my last update, I have completed the data augmentation phase and conducted extensive real world testing which revealed important findings.
+This is what I completed since my last update => 
+1. Data Augmentation Pipeline
+    * Implemented synthetic data augmentation techniques: horizontal flipping, rotation, scaling, noise addition, and time warping
+    * Expanded training dataset from 399 to 3990 samples 
+    * After this the accuracy was 96% but when I tested in the real time it was much less. The issue was data leak. I used the same data for the traning and the testing. 
+    * I discovered and corrected a data leakage issue: the augmentation must be applied only after splitting train/test to avoid augmented copies of the same video appearing in both sets
+2. LSTM Baseline Results 
+    * After fixing the data leak the 
+    * Test Accuracy=> 57% (random baseline would be 5%)
+    * Per-word accuracy varies significantly:
+        * Excellent (100%)=> chair, clothes, help
+        * Good (71-80%)=>  book, drink, cousin, walk
+        * Moderate (50-60%)=> computer, who, year
+        * Poor (0-40%)=> no, thin, before, deaf
+3. Real-World Webcam Testing Observations I tested the model extensively with my own signing and documented the following limitations:
+    * Similar signs cause confusion: Signs with similar hand shapes get misclassified (eg: "no" recognised as "yes", "deaf" as "who", "candy" as "who")
+    * Hand occlusion problem: When one hand is behind the other, MediaPipe cannot track the occluded hand, leading to incorrect predictions
+    * Static vs motion recognition: The model appears to recognise paused hand positions rather than the full motion trajectory. This supports my hypothesis that the LSTM's sequential processing misses global gesture patterns
+    * Signs that worked consistently: chair, walk, go, help, computer
+    * Signs that failed consistently: no, thin, candy, deaf
+Key Insight:
+The real-world testing confirms that the LSTM architecture struggles with temporal dependencies. When I sign "book" (fold hands then open), the model predicts "help" during the intermediate folding position because it processes frames sequentially without understanding the complete gesture context.
+
+Next Steps:
+* Generate confusion matrix to formally document sign confusions
+* Implement Transformer architecture for comparison
+* Evaluate whether attention mechanisms improve recognition of motion-based signs
+Reflection:
+The 57% accuracy is modest but honest. The detailed real-world testing has been valuable in understanding the fundamental challenges: limited training data, sign similarity, hand occlusion, and the sequential nature of LSTM processing. These findings provide strong motivation for exploring the Transformer architecture and will form an important part of my dissertation's evaluation chapter.
