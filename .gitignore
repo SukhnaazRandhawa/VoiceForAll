@@ -41,3 +41,5 @@ data/processed/*.h5
 
 #Database
 wlasl_data.zip
+
+shared-data/
