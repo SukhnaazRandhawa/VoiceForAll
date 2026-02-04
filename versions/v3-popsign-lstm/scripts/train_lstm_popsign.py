@@ -108,7 +108,7 @@ early_stop = EarlyStopping(
 )
 
 checkpoint = ModelCheckpoint(
-    os.path.join(MODEL_DIR, 'best_model_popsign.h5'),
+    os.path.join(MODEL_DIR, 'best_model_popsign.keras'),
     monitor='val_accuracy',
     save_best_only=True,
     verbose=1
