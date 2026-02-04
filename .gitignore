@@ -19,6 +19,7 @@ Thumbs.db
 *.h5
 *.mp4
 *.avi
+*.keras
 
 # Dataset files (too large for Git)
 data/wlasl_raw/*.mp4
