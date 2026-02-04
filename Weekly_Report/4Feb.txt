@@ -1,0 +1,37 @@
+Following my last update about the LSTM baseline results (57% accuracy) and real-world testing challenges, I have made significant progress in addressing the core issue: data scarcity.
+
+Analysis of Data Scaling Strategies
+I looked into whether i could fix my data problem by turning 20 videos into 1,000 using data augmentation. What I found is that augmentation is great for changing the "look" of a video like flipping it, rotating it, or speeding it up but it can't pretend to be a different person. To truly improve, i need more real data. Only real videos can show different hand sizes, unique signing styles, and the various speeds at which people actually move. Essentially, i can’t just use data augementation to replace the variety we get from real human signers.
+
+Based on my research, I’ve decided to move away from the WLASL dataset and switch to PopSign ASL v1.0. The main reason is the massive increase in data volume: while WLASL only offers about 20 videos per sign, PopSign provides around 700. Not only is there more data, but the quality is much higher because the videos were filmed with consent in controlled settings rather than being scraped from YouTube. PopSign features 47 Deaf adults and has been manually reviewed, which explains why its published accuracy is 84% a significant leap over WLASL’s 32%. By focusing on a smaller set of 250 signs with much better examples, i can build a far more reliable tool.
+
+
+Trade-off accepted: Smaller vocabulary (250 vs 2000 signs), but these are practical everyday signs from the MacArthur-Bates vocabulary (hello, mom, dad, dog, etc.) which aligns well with my project goal of facilitating communication.
+
+I have successfully built a data pipeline to handle the new dataset. The process starts by downloading the raw videos from Georgia Tech's servers and using MediaPipe to track 225 key points on the hands and body for every frame. To keep the project efficient, I save these movements as small, compressed files and immediately delete the bulky raw videos. This was essential because the full PopSign dataset is massive about 1 TBwhile my university GPU only has 10 GB of space. To solve this, I moved the processing to Google Colab, which offers more storage, and saved the final, compressed results directly to Google Drive.
+
+I have successfully processed 13 signs.
+Total: 604 MB of features from ~5,000+ videos
+Processing time: ~1 hour per sign (running overnight in Colab)
+
+
+Next Steps => Immediate (This Week)
+1. Train initial model on 13 PopSign signs to validate the approach
+2. Compare accuracy with previous WLASL results
+3. If successful, continue processing remaining 237 signs
+
+Short-term (Next 2 Weeks)
+1. Complete feature extraction for all 250 PopSign signs
+2. Train LSTM and Transformer models on full PopSign dataset
+3. Benchmark against published 84% accuracy
+
+
+Medium-term
+1. Real-world webcam testing with PopSign-trained model
+2. Evaluate if increased data diversity improves real-world performance
+3. Document findings for dissertation
+
+
+Reflection
+The shift to PopSign represents a pragmatic decision: rather than fighting data scarcity with augmentation tricks, I'm addressing it directly with a larger, higher-quality dataset. The 13-sign pilot confirms the pipeline works. The key hypothesis I'm now testing is whether 700 videos/sign (vs 20) will close the gap between test accuracy and real-world performance.
+This aligns with my dissertation's research question about what factors most impact sign language recognition accuracy in real-world deployment.
