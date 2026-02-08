@@ -1,0 +1,36 @@
+Following my last update about switching to the PopSign dataset, I have completed initial training and real-world testing. Here are my findings:
+Progress Made
+Dataset Expansion:
+* Successfully processed 26 signs (up from initial 13)
+* Total dataset: 11,126 videos with ~428 videos per sign
+* This represents a 28x increase over my original WLASL setup (~400 videos total)
+* I have extracted features for approximately 80 signs, but have only trained and tested models on 26 so far
+
+The training results indicate that the model maintains relatively stable performance even as task complexity increases. Doubling the vocabulary from 13 to 26 signs resulted in only a 1.6% decrease in accuracy, suggesting the model scales well.
+
+Real-World Testing:
+Despite promising test results, real-world webcam testing exposed a significant performance gap. While the model achieved 71.20% accuracy on held-out test data, effectiveness dropped to approximately 19% when recognising live signing. Out of 26 signs tested, only five (apple, arm, aunt, animal, backyard) were recognised reliably.
+Debugging Note: Upon investigation, I discovered a configuration mismatch in my webcam testing script - it was loading mismatched model weights and label maps. I am currently debugging this to ensure a fair comparison between models.
+
+Analysis
+This gap between test and real-world accuracy is a critical finding for my dissertation. Possible causes include:
+1. Signer variation - The model learned patterns from 47 PopSign signers but struggles to generalise to my signing style
+2. Recording conditions - PopSign was recorded on smartphones in specific conditions; my webcam setup differs
+3. Hand dominance - Some signs only worked with one hand (left or right), suggesting the model learned hand-specific patterns
+
+Key Insight
+Interestingly, this mirrors findings in the literature about sign language recognition: models often achieve high accuracy on held-out test sets from the same dataset but struggle with new signers. The published 84% accuracy for PopSign was evaluated on held-out signers from the same data collection, not on completely new users in different environments.
+
+Next Steps
+1. I discovered a configuration mismatch in my testing script that may be affecting results. I'm fixing this first.
+2. Create a structured test protocol to fairly compare the 13-sign vs 26-sign models
+3. This finding about test vs real-world accuracy is valuable for my dissertation's research question about real-world deployment challenges
+4. I am processing the signs every night (processed 80 till now) while investigating the accuracy gap
+5. Once debugging is complete, establish reliable baseline metrics
+
+
+Reflection
+The real-world testing gap, while initially disappointing, is actually an important research finding. It demonstrates that having more training data (700 vs 20 videos per sign) improves test accuracy but doesn't automatically solve the generalisation problem to new signers and environments. This suggests that for practical deployment, either:
+* Fine-tuning on target users may be necessary
+* Different architectural approaches (like domain adaptation) should be explored
+* Or the system should be designed with appropriate confidence thresholds
