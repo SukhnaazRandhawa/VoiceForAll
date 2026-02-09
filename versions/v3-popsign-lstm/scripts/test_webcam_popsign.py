@@ -302,7 +302,7 @@ import os
 
 # Configuration
 
-WEIGHTS_PATH = "../models/popsign_weights.npy"
+WEIGHTS_PATH = "../models/popsign_13_weights_fresh.npy"
 DATA_DIR = "../data"
 MAX_FRAMES = 60
 MIN_FRAMES = 10
