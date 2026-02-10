@@ -302,11 +302,11 @@ import os
 
 # Configuration
 
-WEIGHTS_PATH = "../models/popsign_13_weights_fresh.npy"
+WEIGHTS_PATH = "../models/popsign_7_weights.npy"
 DATA_DIR = "../data"
 MAX_FRAMES = 60
 MIN_FRAMES = 10
-NUM_CLASSES = 13
+NUM_CLASSES = 7
 
 
 # Build Model Architecture
@@ -355,7 +355,7 @@ except Exception as e:
 # Load Label Map
 
 print("Loading label map...")
-label_map = np.load(os.path.join(DATA_DIR, "label_map_popsign.npy"), allow_pickle=True).item()
+label_map = np.load(os.path.join(DATA_DIR, "label_map_popsign_7.npy"), allow_pickle=True).item()
 
 if isinstance(list(label_map.keys())[0], int):
     idx_to_sign = label_map
