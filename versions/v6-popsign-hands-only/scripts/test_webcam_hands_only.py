@@ -7,8 +7,8 @@ import os
 
 # CONFIGURATION
 
-WEIGHTS_PATH = "../models/popsign_exact_weights.npy"
-LABEL_MAP_PATH = "../data/label_map_hands_only.npy"
+WEIGHTS_PATH = "../models/popsign_exact_weights_43.npy"
+LABEL_MAP_PATH = "../data/label_map_hands_only_43.npy"
 MAX_FRAMES = 60
 MIN_FRAMES = 10
 
