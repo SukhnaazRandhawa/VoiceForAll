@@ -1,0 +1,12 @@
+I'm pleased to share a significant breakthrough in my sign language recognition project. 
+Following the PopSign paper methodology exactly (hands-only features with left-hand mirroring and Bidirectional LSTM), 
+I've achieved excellent results. The model now has a test accuracy of 77.04% and, more importantly, 
+a real-world accuracy of 88%, with 38 out of 43 signs working reliably. Many signs now achieve 95-100% confidence 
+during live webcam testing.This is a dramatic improvement from my previous versions. V4 (BiLSTM with 225 features)
+ achieved only 19% real-world accuracy, and V5 (Transformer with 225 features) achieved 24%. The new V6 model with 
+ 63 hand-only features achieves 88% real-world accuracy. This validates that simpler, focused features generalise 
+ significantly better to unseen signers than complex multi-modal features, which is an important finding for my 
+ dissertation. Before Friday's meeting, I aim to expand the vocabulary as much as possible by processing and 
+ training on additional signs. I will also prepare a live demonstration of the working system and document the 
+ findings comparing all model versions. I'm excited to demonstrate the progress and discuss next steps for the 
+ sentence generation component.
