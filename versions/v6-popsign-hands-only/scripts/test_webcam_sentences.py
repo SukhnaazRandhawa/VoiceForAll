@@ -987,9 +987,50 @@ def main():
                 cv2.putText(frame, "Press ENTER to generate sentence", (535, panel_y + 25),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS['text_gray'], 1)
             
-            # BOTTOM BAR - Controls 
-            bar_y = frame_height - 45
-            draw_rounded_rect(frame, (0, bar_y), (frame_width, frame_height), COLORS['bg_dark'], radius=0)
+            # # BOTTOM BAR - Controls 
+            # bar_y = frame_height - 45
+            # draw_rounded_rect(frame, (0, bar_y), (frame_width, frame_height), COLORS['bg_dark'], radius=0)
+            
+            # controls = [
+            #     ("SPACE", "Record"),
+            #     ("ENTER", "Generate & Speak"),
+            #     ("C", "Clear"),
+            #     ("Q", "Quit")
+            # ]
+            
+            # x_pos = 20
+            # for key, action in controls:
+            #     # Key box
+            #     cv2.rectangle(frame, (x_pos, bar_y + 8), (x_pos + 60, bar_y + 35), COLORS['bg_panel_light'], -1)
+            #     cv2.putText(frame, key, (x_pos + 8, bar_y + 27),
+            #                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS['text_white'], 1)
+                
+            #     # Action text
+            #     cv2.putText(frame, action, (x_pos + 70, bar_y + 27),
+            #                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS['text_gray'], 1)
+                
+            #     x_pos += 180
+            
+            # # App title
+            # cv2.putText(frame, "SignSpeak AI", (frame_width - 150, bar_y + 27),
+            #            cv2.FONT_HERSHEY_SIMPLEX, 0.6, COLORS['accent_blue'], 2)
+            
+            # cv2.imshow('SignSpeak AI - Sign Language to Speech', frame)
+            
+            # key = cv2.waitKey(1) & 0xFF
+            
+            
+            
+            #  BOTTOM BAR - Controls 
+            bar_y = frame_height - 50
+            
+            # Dark background bar
+            overlay = frame.copy()
+            cv2.rectangle(overlay, (0, bar_y), (frame_width, frame_height), COLORS['bg_dark'], -1)
+            cv2.addWeighted(overlay, 0.9, frame, 0.1, 0, frame)
+            
+            # Top border line
+            cv2.line(frame, (0, bar_y), (frame_width, bar_y), COLORS['bg_panel_light'], 1)
             
             controls = [
                 ("SPACE", "Record"),
@@ -998,27 +1039,36 @@ def main():
                 ("Q", "Quit")
             ]
             
-            x_pos = 20
+            # Calculate spacing
+            available_width = frame_width - 180  # Leave space for app name
+            spacing = available_width // len(controls)
+            
+            x_pos = 15
             for key, action in controls:
-                # Key box
-                cv2.rectangle(frame, (x_pos, bar_y + 8), (x_pos + 60, bar_y + 35), COLORS['bg_panel_light'], -1)
-                cv2.putText(frame, key, (x_pos + 8, bar_y + 27),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS['text_white'], 1)
+                # Key box with border
+                key_box_width = len(key) * 13 + 16
+                cv2.rectangle(frame, (x_pos, bar_y + 10), (x_pos + key_box_width, bar_y + 40), 
+                             COLORS['bg_panel_light'], -1)
+                cv2.rectangle(frame, (x_pos, bar_y + 10), (x_pos + key_box_width, bar_y + 40), 
+                             COLORS['text_gray'], 1)
+                cv2.putText(frame, key, (x_pos + 8, bar_y + 31),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.55, COLORS['text_white'], 1)
                 
                 # Action text
-                cv2.putText(frame, action, (x_pos + 70, bar_y + 27),
+                cv2.putText(frame, action, (x_pos + key_box_width + 8, bar_y + 31),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS['text_gray'], 1)
                 
-                x_pos += 180
+                x_pos += spacing
             
-            # App title
-            cv2.putText(frame, "SignSpeak AI", (frame_width - 150, bar_y + 27),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, COLORS['accent_blue'], 2)
-            
+            # App title (right side)
+            cv2.putText(frame, "SignSpeak AI", (frame_width - 145, bar_y + 33),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, COLORS['accent_blue'], 2)
+
+            # ADD THESE TWO LINES:
             cv2.imshow('SignSpeak AI - Sign Language to Speech', frame)
-            
             key = cv2.waitKey(1) & 0xFF
-            
+
+
             # SPACE - Record
             if key == ord(' '):
                 if not recording:
