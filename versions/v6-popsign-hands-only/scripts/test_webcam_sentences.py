@@ -5,6 +5,16 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Bidirectional, LSTM, Dense, Dropout, Masking, Input
 import os
 import requests
+import subprocess
+
+def speak_sentence(sentence):
+    """Use macOS built-in text-to-speech."""
+    try:
+        # Use macOS 'say' command
+        subprocess.run(['say', '-r', '150', sentence], check=True)
+        print(f"   Spoke: {sentence}")
+    except Exception as e:
+        print(f"   Speech error: {e}")
 
 # CONFIGURATION
 
@@ -405,6 +415,36 @@ def main():
                     
                     recorded_frames = []
             
+            # # ENTER - Form sentence
+            # elif key == 13:
+            #     if collected_words:
+            #         print("\n" + "="*50)
+            #         print(" FORMING SENTENCE...")
+            #         print(f"   Words with confidence:")
+            #         for word, conf in zip(collected_words, collected_confidences):
+            #             if conf >= 0.70:
+            #                 status = " confident"
+            #             elif conf >= 0.50:
+            #                 status = " medium"
+            #             else:
+            #                 status = " uncertain"
+            #             print(f"      {word}: {conf*100:.0f}% ({status})")
+                    
+            #         if ollama_available:
+            #             generated_sentence, used_words = form_sentence_with_ollama(
+            #                 collected_words, collected_confidences
+            #             )
+            #         else:
+            #             generated_sentence, used_words = form_sentence_simple(
+            #                 collected_words, collected_confidences
+            #             )
+                    
+            #         print(f"\n    SENTENCE: {generated_sentence}")
+            #         print("="*50 + "\n")
+            #     else:
+            #         print(" No words to form sentence.\n")
+            
+            
             # ENTER - Form sentence
             elif key == 13:
                 if collected_words:
@@ -419,7 +459,7 @@ def main():
                         else:
                             status = " uncertain"
                         print(f"      {word}: {conf*100:.0f}% ({status})")
-                    
+        
                     if ollama_available:
                         generated_sentence, used_words = form_sentence_with_ollama(
                             collected_words, collected_confidences
@@ -427,10 +467,14 @@ def main():
                     else:
                         generated_sentence, used_words = form_sentence_simple(
                             collected_words, collected_confidences
-                        )
-                    
+                    )
+        
                     print(f"\n    SENTENCE: {generated_sentence}")
                     print("="*50 + "\n")
+        
+                    #  SPEAK THE SENTENCE
+                    speak_sentence(generated_sentence)
+        
                 else:
                     print(" No words to form sentence.\n")
             
