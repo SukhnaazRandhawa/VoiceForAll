@@ -384,12 +384,24 @@ def main():
             # LEFT PANEL - Status & Recording 
             panel_y = draw_panel(frame, 10, 10, 350, 180, "RECORDING STATUS")
             
-            # Hand detection status
+            # # Hand detection status
+            # if results.right_hand_landmarks:
+            #     hand_text = "Right Hand Detected"
+            #     hand_color = COLORS['accent_green']
+            # elif results.left_hand_landmarks:
+            #     hand_text = "Left Hand Detected"
+            #     hand_color = COLORS['accent_yellow']
+            # else:
+            #     hand_text = "No Hand Detected"
+            #     hand_color = COLORS['accent_red']
+            
+            
+            # Hand detection status (swapped because frame is mirrored)
             if results.right_hand_landmarks:
-                hand_text = "Right Hand Detected"
+                hand_text = "Left Hand Detected"  # Swapped
                 hand_color = COLORS['accent_green']
             elif results.left_hand_landmarks:
-                hand_text = "Left Hand Detected"
+                hand_text = "Right Hand Detected"  # Swapped
                 hand_color = COLORS['accent_yellow']
             else:
                 hand_text = "No Hand Detected"
