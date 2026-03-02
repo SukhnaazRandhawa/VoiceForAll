@@ -512,11 +512,11 @@ def main():
                 x_pos += spacing
             
             # App title (right side)
-            cv2.putText(frame, "SignSpeak AI", (frame_width - 145, bar_y + 33),
+            cv2.putText(frame, "VoiceForAll", (frame_width - 145, bar_y + 33),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, COLORS['accent_blue'], 2)
 
             # ADD THESE TWO LINES:
-            cv2.imshow('SignSpeak AI - Sign Language to Speech', frame)
+            cv2.imshow('VoiceForAll - Sign Language to Speech', frame)
             key = cv2.waitKey(1) & 0xFF
 
 
