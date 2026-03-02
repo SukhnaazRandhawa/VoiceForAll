@@ -1,6 +1,6 @@
 # Version 3: PopSign LSTM Baseline
 
-[← Back to Main](../../README.md) | [← Previous: V2 Transformer](../v2-transformer/README.md) | [Next: V4 PopSign BiLSTM →](../v4-popsign-bilstm/README.md)
+[← Back to Main](../../README.md) | [← Previous: V2 Transformer](../v2-transformer/V2_README.md) | [Next: V4 PopSign BiLSTM →](../v4-popsign-bilstm/V4_README.md)
 
 ---
 
@@ -364,7 +364,7 @@ The findings here directly shaped V4's design:
 - **Left-hand mirroring** : normalising left-handed signs to right-hand perspective
 - **Expanded vocabulary** : moving toward more signs with better feature selection
 
-[Continue to Version 4 →](../v4-popsign-bilstm/README.md)
+[Continue to Version 4 →](../v4-popsign-bilstm/V4_README.md)
 
 ---
 

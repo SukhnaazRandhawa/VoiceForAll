@@ -1,6 +1,6 @@
 # Version 2: Transformer with Proper Evaluation
 
-[← Back to Main](../../README.md) | [← Previous: V1 LSTM](../v1-lstm-baseline/README.md) | [Next: V3 PopSign LSTM →](../v3-popsign-lstm/README.md)
+[← Back to Main](../../README.md) | [← Previous: V1 LSTM](../v1-lstm-baseline/V1_README.md) | [Next: V3 PopSign LSTM →](../v3-popsign-lstm/V3_README.md)  
 
 ---
 
@@ -183,4 +183,4 @@ The commented-out code at the top of `app.py` is the earlier version that used t
 
 The honest evaluation in V2 established that test accuracy alone is insufficient. V3 moved to the **PopSign dataset and methodology**, which was specifically designed for real-world sign recognition and provided a stronger foundation for practical usability.
 
-[Continue to Version 3 →](../v3-popsign-lstm/README.md)
+[Continue to Version 3 →](../v3-popsign-lstm/V3_README.md)

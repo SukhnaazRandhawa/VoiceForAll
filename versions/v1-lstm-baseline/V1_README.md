@@ -1,6 +1,6 @@
 # Version 1: LSTM Baseline
 
-[← Back to Main](../../README.md) | [Next: V2 Transformer →](../v2-transformer/README.md)
+[← Back to Main](../../README.md) | [Next: V2 Transformer →](../v2-transformer/V2_README.md)
 
 ---
 
@@ -144,4 +144,4 @@ The problems found here directly motivated the V2 design:
 - **Switched to Transformer architecture** — attention mechanisms better capture which frames matter most for each sign
 - **Improved evaluation methodology** — honest train/test separation and per-class accuracy reporting
 
-[Continue to Version 2 →](../v2-transformer/README.md)
+[Continue to Version 2 →](../v2-transformer/V2_README.md)
