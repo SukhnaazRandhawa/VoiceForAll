@@ -1,345 +1,304 @@
-# Version 4 Analysis Report: Bidirectional LSTM on PopSign Dataset
+# Version 4: Bidirectional LSTM on PopSign Dataset
 
-## Executive Summary
-
-This report documents the development and evaluation of Version 4 (V4) of the sign language recognition system, which implements a Bidirectional LSTM architecture trained on the PopSign ASL dataset. The analysis reveals important insights about the gap between test accuracy and real world performance, and identifies key factors affecting sign recognition accuracy.
+[← Back to Main](../../README.md) | [← Previous: V3 PopSign LSTM](../v3-popsign-lstm/V3_README.md) | [Next: V5 PopSign Transformer →](../v5-popsign-transformer/V5_README.md)
 
 ---
 
-## 1. Model Architecture
+## Overview
 
-### V4: Bidirectional LSTM (Based on PopSign Paper)
+V4 implements the **Bidirectional LSTM architecture** described in the PopSign paper, scaling up to 42 signs and replacing the regular LSTM from V3. It also introduces two new architectural elements : `Masking` and `Bidirectional` wrapping, and removes BatchNormalization in favour of higher dropout.
 
-```
-Input: (60 frames × 225 features)
-    ↓
-Masking Layer (mask_value=0.0)
-    ↓
-Bidirectional LSTM (128 units) + Dropout (0.5)
-    ↓
-Bidirectional LSTM (128 units) + Dropout (0.5)
-    ↓
-Dense (42 classes, softmax)
-```
+The headline result is that despite the task being significantly harder (42 signs vs 13), test accuracy stayed roughly the same as V3 (72.63% vs 72.80%), which confirms that BiLSTM is a stronger architecture. However, real-world webcam accuracy dropped sharply, from ~54% in V3 to ~19% in V4, because more signs means more opportunities for confusion, and many of the new signs share similar visual patterns.
 
-### Key Differences from V3
+V4 produced the most thorough real-world analysis of the project so far, identifying four concrete reasons why test accuracy and webcam accuracy diverge so dramatically. These findings directly shaped the feature selection strategy in V5 and V6.
+
+---
+
+## What Changed From V3
 
 | Component | V3 | V4 |
-|-----------|----|----|
-| LSTM Type | Regular (unidirectional) | Bidirectional |
-| LSTM Units | 128 → 64 | 128 → 128 |
+|---|---|---|
+| LSTM type | Regular (unidirectional) | Bidirectional |
+| LSTM units | 128 → 64 | 128 → 128 (both layers) |
 | Dropout | 0.3 | 0.5 |
-| Batch Normalization | Yes | No (using Masking instead) |
-| Number of Signs | 13-26 | 42 |
+| BatchNormalization | Yes | No |
+| Masking layer | No | Yes |
+| Number of signs | 13–26 | 42 |
+| Total training videos | 5,861 | 14,483 |
 
 ---
 
-## 2. Dataset
+## Architecture
 
-### PopSign ASL v1.0
+```
+Input(60, 225)
+→ Masking(mask_value=0.0)
+→ Bidirectional(LSTM(128, return_sequences=True))
+→ Dropout(0.5)
+→ Bidirectional(LSTM(128, return_sequences=False))
+→ Dropout(0.5)
+→ Dense(42, softmax)
+```
 
-| Attribute | Value |
-|-----------|-------|
-| Source | Georgia Tech |
-| Total Signs Available | 250 |
-| Signs Used in V4 | 42 |
-| Total Videos | 14,483 |
-| Average Videos per Sign | ~345 |
-| Signers | 47 Deaf adults |
-| Features | 225 (MediaPipe: hands + pose) |
-| Frame Length | 60 frames (padded) |
+### What is Bidirectional LSTM?
+
+A regular LSTM reads the sequence in one direction: frame 1 → frame 2 → ... → frame 40. By the time it reaches frame 40, it has built up context from everything before it, but it has no knowledge of what comes after any given frame.
+
+A Bidirectional LSTM runs **two LSTMs simultaneously** on the same sequence:
+- One reads **forward**: frame 1 → frame 2 → ... → frame 60
+- One reads **backward**: frame 60 → frame 59 → ... → frame 1
+
+Their outputs are concatenated at each time step, so every frame's representation has context from both the past **and** the future.
+
+```
+Forward LSTM:  frame1 → frame2 → frame3 → ... → frame60
+                                                      ↓
+                                               concatenate → richer representation
+                                                      ↑
+Backward LSTM: frame1 ← frame2 ← frame3 ← ... ← frame60
+```
+
+For sign language this is particularly valuable. Consider a sign where the hand shape at frame 30 is ambiguous, it could belong to two different signs. The forward pass knows what happened before frame 30, and the backward pass knows what happens after. Together they can resolve the ambiguity that neither direction alone could.
+
+In Keras, wrapping any LSTM with `Bidirectional()` handles all of this automatically, it creates both LSTMs and concatenates their outputs.
+
+### What is the Masking Layer?
+
+```python
+Masking(mask_value=0.0)
+```
+
+Recall that shorter videos are zero-padded to reach 60 frames. This means some frames at the end of a sequence are entirely zeros, they don't represent real signing, just padding.
+
+Without masking, the LSTM treats these zero frames as real data and tries to learn from them, which adds noise. The `Masking` layer tells the model: **"any frame that is entirely zeros is padding, ignore it during computation."**
+
+The model then only processes the real frames of each video, which is both more accurate and more efficient. This is especially important in V4 because with 42 signs from 47 signers, video lengths vary considerably.
+
+### Why Higher Dropout (0.5 vs 0.3)?
+
+With more signs (42 vs 13), the model has more parameters and a higher risk of overfitting, memorising training examples rather than learning general patterns. Increasing dropout from 0.3 to 0.5 means 50% of neurons are randomly switched off during each training step, forcing the remaining neurons to learn more robust, distributed representations.
+
+### Why Remove BatchNormalization?
+
+V3 used BatchNormalization after each LSTM layer. V4 removes it. The reasoning: Masking creates variable-length sequences within each batch, and BatchNormalization computes statistics across the batch at each time step. When some sequences are masked at different points, these statistics become inconsistent and can actually hurt training. The Masking + BatchNorm combination is problematic, so BatchNorm was dropped in favour of higher Dropout for regularisation.
+
+---
+
+## Dataset
+
+- **Dataset:** PopSign ASL v1.0 (same as V3)
+- **Signs used:** 42 (expanded from 13 in V3)
+- **Total videos:** 14,483
+- **Average videos per sign:** ~345
+- **Signers:** 47 Deaf adults
+- **Features:** 225 per frame (left hand + right hand + pose)
+- **Sequence length:** 60 frames (zero-padded)
 
 ### Training Configuration
 
 | Parameter | Value |
-|-----------|-------|
-| Train/Test Split | 80/20 |
-| Training Samples | 11,586 |
-| Test Samples | 2,897 |
-| Batch Size | 32 |
-| Epochs | 40 (with early stopping) |
+|---|---|
+| Train/test split | 80/20 stratified |
+| Training samples | 11,586 |
+| Test samples | 2,897 |
+| Batch size | 32 |
+| Max epochs | 40 |
+| Early stopping patience | 10 |
 | Optimizer | Adam |
 
 ---
 
-## 3. Results
+## Results
 
-### 3.1 Test Accuracy Comparison
+### Test Set Performance
 
 | Version | Signs | Architecture | Test Accuracy |
-|---------|-------|--------------|---------------|
+|---|---|---|---|
 | V3 | 13 | Regular LSTM | 72.80% |
 | V3 | 26 | Regular LSTM | 71.20% |
 | **V4** | **42** | **Bidirectional LSTM** | **72.63%** |
 | PopSign Paper | 250 | Bidirectional LSTM | 84.2% |
 
-### 3.2 Real-World Performance
+Maintaining 72.63% accuracy on 42 signs (vs 72.80% on 13 signs) is a meaningful result, the task tripled in difficulty but accuracy barely changed, confirming that BiLSTM is a genuine architectural improvement over regular LSTM.
 
-Extensive real-world testing was conducted by performing each sign manually in front of a webcam.
+### Real-World Webcam Performance
 
-#### Signs That Work Reliably (8 signs)
+#### Signs That Work Reliably
 
-| Sign | Confidence | Consistency |
-|------|------------|-------------|
+| Sign | Confidence | Notes |
+|---|---|---|
 | arm | 99.9% | Excellent |
 | brother | 99.9% | Excellent |
 | bed | 99.3% | Excellent |
 | bye | 97.8% | Excellent |
-| apple | 97.1% | Excellent |
-| find | 98.5% | Good (sometimes inconsistent) |
+| find | 98.5% | Good |
+| apple | 97.1% | Good |
 | blue | 92.3% | Good |
 | any | 89.1% | Good |
 
-#### Signs That Work Sometimes (8 signs)
+#### Signs That Work Sometimes
 
 | Sign | Best Confidence | Issue |
-|------|-----------------|-------|
+|---|---|---|
 | dryer | 96.3% | Inconsistent |
 | because | 86.0% | Confused with black |
 | balloon | 85.0% | Inconsistent |
 | beside | 81.8% | Inconsistent |
 | black | 65.1% | Confused with because |
 | close | 60.9% | Inconsistent |
-| chair | 40.8% | Often confused with another/arm |
+| chair | 40.8% | Often confused with arm |
 | alligator | 39.2% | Often confused with another |
 
-#### Signs That Don't Work (26 signs)
-
-These signs consistently fail in real world testing, typically being confused with similar signs.
-
-### 3.3 Accuracy Summary
+#### Summary
 
 | Metric | Value |
-|--------|-------|
-| Test Accuracy (same dataset) | 72.63% |
-| Real-World Accuracy (all signs) | ~19% (8/42) |
-| Real-World Accuracy (reliable signs only) | ~38% (16/42 including "sometimes works") |
-| **Accuracy Gap** | **~53%** |
+|---|---|
+| Test set accuracy | 72.63% |
+| Real-world accuracy (reliable only) | ~19% (8/42) |
+| Real-world accuracy (including partial) | ~38% (16/42) |
+| Gap between test and real-world | ~53% |
 
 ---
 
-## 4. Analysis: Why the Gap Between Test and Real-World Accuracy?
+## Why Such a Large Test vs Real-World Gap?
 
-### 4.1 Sign Dimensionality (2D vs 3D)
+V4's real-world testing was the most systematic in the project so far. Four distinct causes were identified:
 
-**Finding:** Signs with planar (2D) movements achieve higher recognition rates than signs with depth-based (3D) movements.
+### 1. 2D Camera Cannot Capture 3D Movement
 
-| Sign Type | Examples | Recognition |
-|-----------|----------|-------------|
-| 2D (flat motion) | bye, blue, arm, brother |  High accuracy |
-| 3D (depth motion) | alligator, cloud, balloon |  Lower accuracy |
+A laptop webcam only captures two dimensions (x and y). Signs that move **toward or away from the camera** depth movement, lose their most distinctive feature entirely.
 
-**Explanation:** A monocular webcam cannot accurately capture depth. Signs that move toward or away from the camera lose critical movement information.
+| Sign type | Examples | Real-world result |
+|---|---|---|
+| Flat/planar movement | bye, blue, arm, brother |  High accuracy |
+| Depth-based movement | alligator, cloud, balloon |  Low accuracy |
 
-### 4.2 Hand-Face Occlusion
+Signs like `alligator` involve opening and closing two hands in 3D space, on a 2D webcam this just looks like hands moving slightly, which resembles several other signs.
 
-**Finding:** Signs involving hand contact with facial features show significantly reduced accuracy.
+### 2. Hand-Face Occlusion
 
-| Sign | Involves | Predicted As |
-|------|----------|--------------|
+When the hand touches or covers part of the face during a sign, MediaPipe loses track of the hand landmarks, they become occluded by the face. The result is missing or wildly incorrect landmark values feeding into the model.
+
+| Sign | Involves | Predicted as |
+|---|---|---|
 | ear | Touch ear | blue, bed |
 | eye | Touch eye | cheek |
 | cheek | Touch cheek | ear, apple |
 | chin | Touch chin | cheek, apple |
-| carrot | Hand near face + motion | airplane, ear |
 
-**Explanation:** MediaPipe landmark detection fails when hands occlude facial features, resulting in missing or incorrect landmark data.
+### 3. Inter-Sign Visual Similarity
 
-### 4.3 Inter-Sign Similarity
+Many signs share similar hand shapes or movements. The model correctly learned that these are similar, which is actually evidence the model is working — but it cannot always distinguish them:
 
-**Finding:** The model successfully learned sign patterns, evidenced by confusion between genuinely similar signs.
+| Actual sign | Confused with | Why |
+|---|---|---|
+| bed | bedroom | Same base hand shape |
+| black | because | Similar hand position near face |
+| alligator | cloud, balloon | Both involve two hands opening/closing |
+| bee | airplane | Similar single-hand shape |
 
-| Actual Sign | Confused With | Similarity |
-|-------------|---------------|------------|
-| bed | bedroom | Same base sign |
-| black | because | Similar hand position |
-| alligator | cloud, balloon | Two hands opening/closing |
-| closet | chair | Similar arm movement |
-| bee | airplane | Similar hand shape |
+Importantly, the **correct sign often appeared in the top-3 predictions** even when it wasn't the top prediction, alligator was 3rd (10.6%) when predicted as "another", chair was 2nd (22.7%) when predicted as "arm". This means the model has learned something real, it's just not confident enough to rank the right answer first.
 
-**Positive Indicator:** The correct prediction often appeared in the top-3 results:
-- alligator: Predicted "another" (24%), but "alligator" was 3rd (10.6%)
-- chair: Predicted "arm" (33%), but "chair" was 2nd (22.7%)
-- cloud: Predicted "alligator" (46%), but "cloud" was 2nd (44%)
+### 4. Signer and Domain Variation
 
-### 4.4 Signer Variation
+The model was trained on 47 native Deaf signers recorded on a Pixel 4A smartphone in controlled conditions. Real-world testing used a laptop webcam with a non-native signer in variable lighting. This **domain shift** : the difference between training conditions and deployment conditions, accounts for a significant portion of the accuracy gap.
 
-**Finding:** The model learned dataset-specific patterns rather than generalizable sign features.
-
-| Factor | PopSign Dataset | Real-World Testing |
-|--------|-----------------|-------------------|
-| Signers | 47 Deaf adults (native ASL) | 1 non-native signer |
-| Recording Device | Smartphone (selfie camera) | Laptop webcam |
-| Environment | Controlled | Variable |
-| Signing Proficiency | Native/fluent | Learning |
-
-### 4.5 Train/Test Split Methodology
-
-**Finding:** Random train/test split may not reflect real-world generalization.
-
-| Split Method | Description | Effect |
-|--------------|-------------|--------|
-| Random (our approach) | Same signers in train and test | Inflated test accuracy |
-| Signer independent (paper) | Different signers in train vs test | More realistic |
+This is also why the random train/test split produces optimistic results: the same 47 signers appear in both training and test sets, so the model has seen each signer's style before. In the real world, the model encounters a completely new signer it has never trained on.
 
 ---
 
-## 5. Comparison: V3 vs V4
+## Complete Real-World Test Results (42 Signs)
 
-### 5.1 Test Accuracy
-
-| Metric | V3 (26 signs) | V4 (42 signs) |
-|--------|---------------|---------------|
-| Test Accuracy | 71.20% | 72.63% |
-| Improvement | - | +1.43% |
-
-Despite having more signs (harder task), V4 achieved slightly higher accuracy due to the Bidirectional LSTM architecture.
-
-### 5.2 Real-World Performance
-
-| Metric | V3 (13 signs) | V4 (42 signs) |
-|--------|---------------|---------------|
-| Signs Working | 7 | 8 |
-| Working Percentage | 54% | 19% |
-| Signs in Common | apple, arm | apple, arm |
-
-### 5.3 Signs That Changed
-
-| Sign | V3 | V4 |
-|------|----|----|
-| aunt |  Works |  Fails (→ ear) |
-| hello |  Works | Not tested |
-| bed | Not in V3 |  Works |
-| blue | Not in V3 |  Works |
-| brother | Not in V3 |  Works |
-| bye | Not in V3 |  Works |
-
----
-
-## 6. Key Findings
-
-### 6.1 Technical Limitations
-
-1. **Monocular Camera Limitation:** 2D cameras cannot capture 3D sign movements accurately
-2. **Occlusion Problem:** Hand face contact causes landmark detection failures
-3. **Feature Representation:** 225 features (hands + pose) may include noise from pose landmarks
-
-### 6.2 Dataset Limitations
-
-1. **Signer Diversity Gap:** Model trained on 47 Deaf signers doesn't generalize to new signers
-2. **Recording Conditions:** Smartphone selfie vs webcam creates domain shift
-3. **Sign Selection:** Some signs are inherently harder to distinguish visually
-
-### 6.3 Positive Findings
-
-1. **Model Learning Confirmed:** Similar signs confuse each other (expected behavior)
-2. **Top-3 Accuracy:** Correct sign often in top 3 predictions (~60% of failures)
-3. **Architecture Improvement:** Bidirectional LSTM maintains accuracy with more signs
-4. **Reliable Subset Exists:** 8-16 signs work consistently for practical use
-
----
-
-## 7. Recommendations
-
-### 7.1 For Practical Application
-
-1. **Use Reliable Signs Only:** Build demo with 8-16 working signs
-2. **Add Sentence Generation:** Convert sign sequences to natural language using NLP
-3. **User Feedback:** Show top-3 predictions to let users select correct sign
-
-### 7.2 For Future Improvement
-
-1. **Hands-Only Features (63):** Match PopSign paper exactly
-2. **Signer-Independent Split:** More realistic evaluation
-3. **Transformer Architecture:** Kaggle winner achieved >90% accuracy
-4. **Data Augmentation:** Increase signer diversity artificially
-5. **3D Camera:** Use depth sensor for better 3D sign capture
-
----
-
-## 8. Conclusion
-
-Version 4 successfully implemented a Bidirectional LSTM architecture achieving 72.63% test accuracy on 42 signs. However, real-world testing revealed a significant gap (~53%) between test and real-world performance.
-
-The analysis identified four key factors affecting real-world accuracy:
-1. Sign dimensionality (2D vs 3D movements)
-2. Hand-face occlusion during signing
-3. Inter-sign visual similarity
-4. Signer variation and domain shift
-
-Despite these challenges, 8 signs work reliably with >85% confidence, providing a foundation for a practical sign-to-sentence translation system.
-
----
-
-## 9. Files and Artifacts
-
-### Models
-| File | Description |
-|------|-------------|
-| `best_model_bilstm_42.h5` | Trained Bidirectional LSTM model |
-| `bilstm_42_weights.npy` | Extracted weights for laptop deployment |
-
-### Data
-| File | Description |
-|------|-------------|
-| `X_popsign_42.npy` | Features (14483, 60, 225) |
-| `y_popsign_42.npy` | Labels (14483,) |
-| `label_map_popsign_42.npy` | Sign index to name mapping |
-
-### Scripts
-| File | Description |
-|------|-------------|
-| `train_bilstm.py` | Training script |
-| `test_webcam_bilstm.py` | Real-world testing script |
-
----
-
-## 10. Appendix: Complete Real-World Test Results
-
-### Signs Tested (42 total)
-
-| # | Sign | Works? | Confidence | Notes |
-|---|------|--------|------------|-------|
-| 1 | after | no | - | Predicted: arm |
-| 2 | airplane | no | - | Predicted: bye |
-| 3 | all | no | - | Predicted: brother |
-| 4 | alligator | may be | 39% | Inconsistent |
-| 5 | animal | no | - | Predicted: bath/brother |
-| 6 | another | no | - | Predicted: cry |
+| # | Sign | Result | Confidence | Notes |
+|---|---|---|---|---|
+| 1 | after | no | — | Predicted: arm |
+| 2 | airplane | no | — | Predicted: bye |
+| 3 | all | no | — | Predicted: brother |
+| 4 | alligator | partial | 39% | Inconsistent |
+| 5 | animal | no | — | Predicted: bath/brother |
+| 6 | another | no | — | Predicted: cry |
 | 7 | any | yes | 89% | Works well |
 | 8 | apple | yes | 97% | Works well |
 | 9 | arm | yes | 99% | Excellent |
-| 10 | aunt | no | - | Predicted: ear |
-| 11 | awake | no | - | Predicted: apple |
-| 12 | backyard | no | - | Predicted: ear |
-| 13 | bad | no | - | Predicted: eye/cheek |
-| 14 | balloon | may be | 85% | Inconsistent |
-| 15 | bath | no | - | Predicted: brother |
-| 16 | because | may be | 86% | Sometimes works |
+| 10 | aunt | no | — | Predicted: ear |
+| 11 | awake | no | — | Predicted: apple |
+| 12 | backyard | no | — | Predicted: ear |
+| 13 | bad | no | — | Predicted: eye/cheek |
+| 14 | balloon | partial | 85% | Inconsistent |
+| 15 | bath | no | — | Predicted: brother |
+| 16 | because | partial | 86% | Sometimes works |
 | 17 | bed | yes | 99% | Excellent |
-| 18 | bedroom | no | - | Predicted: bed |
-| 19 | bee | no | - | Predicted: airplane |
-| 20 | before | no | - | Predicted: bye |
-| 21 | beside | may be | 82% | Sometimes works |
-| 22 | black | may be | 65% | Confused with because |
-| 23 | blow | no | - | Predicted: bee |
+| 18 | bedroom | no | — | Predicted: bed |
+| 19 | bee | no | — | Predicted: airplane |
+| 20 | before | no | — | Predicted: bye |
+| 21 | beside | partial | 82% | Sometimes works |
+| 22 | black | partial | 65% | Confused with because |
+| 23 | blow | no | — | Predicted: bee |
 | 24 | blue | yes | 92% | Works well |
 | 25 | brother | yes | 99% | Excellent |
 | 26 | bye | yes | 98% | Excellent |
-| 27 | car | no | - | Predicted: dog/chair |
-| 28 | carrot | no | - | Predicted: airplane/ear |
-| 29 | cereal | no | - | Predicted: eye |
-| 30 | chair | may be | 41% | Inconsistent |
-| 31 | cheek | no | - | Predicted: apple/ear |
-| 32 | chin | no | - | Predicted: cheek/apple |
-| 33 | close | may be | 61% | Sometimes works |
-| 34 | closet | no | - | Predicted: chair |
-| 35 | cloud | no | - | Predicted: alligator |
-| 36 | cry | no | - | Predicted: bath |
-| 37 | dryer | may be | 96% | Sometimes works |
-| 38 | ear | no | - | Predicted: blue/bed |
-| 39 | every | no | - | Predicted: blue/car |
-| 40 | eye | no | - | Predicted: cheek |
+| 27 | car | no | — | Predicted: dog/chair |
+| 28 | carrot | no | — | Predicted: airplane/ear |
+| 29 | cereal | no | — | Predicted: eye |
+| 30 | chair | partial | 41% | Inconsistent |
+| 31 | cheek | no | — | Predicted: apple/ear |
+| 32 | chin | no | — | Predicted: cheek/apple |
+| 33 | close | partial | 61% | Sometimes works |
+| 34 | closet | no | — | Predicted: chair |
+| 35 | cloud | no | — | Predicted: alligator |
+| 36 | cry | no | — | Predicted: bath |
+| 37 | dryer | partial | 96% | Sometimes works |
+| 38 | ear | no | — | Predicted: blue/bed |
+| 39 | every | no | — | Predicted: blue/car |
+| 40 | eye | no | — | Predicted: cheek |
 | 41 | find | yes | 98% | Works well |
-| 42 | (additional signs tested as available) | - | - | - |
+| 42 | (additional) | — | — | — |
 
+---
+
+## Files
+
+### Scripts
+
+| File | Description |
+|---|---|
+| `scripts/train_bilstm.py` | Trains the Bidirectional LSTM on 42 signs; includes masking, higher dropout, and weight saving |
+| `scripts/test_webcam_bilstm.py` | Webcam app — rebuilds architecture from code, loads weights from `.npy`, manual record-and-predict interaction |
+
+### Data
+
+| File | Shape | Description |
+|---|---|---|
+| `data/X_popsign_42.npy` | (14483, 60, 225) | Feature arrays for 42 signs |
+| `data/y_popsign_42.npy` | (14483,) | Integer class labels |
+| `data/label_map_popsign_42.npy` | dict | `{0: 'after', 1: 'airplane', ...}` |
+
+### Models & Saved Artefacts
+
+| File | Description |
+|---|---|
+| `models/bilstm_42_weights.npy` | Trained BiLSTM weights saved as numpy array for cross-platform compatibility |
+
+> Note: The `.h5` model file (`best_model_bilstm_42.h5`) is saved during training but not committed, weights are loaded via the `.npy` file in the webcam app.
+
+---
+
+## Key Learnings
+
+1. **Bidirectional context genuinely helps** : maintaining 72.63% on 42 signs (vs 72.80% on 13) confirms BiLSTM extracts more signal from the same features than regular LSTM.
+2. **More signs ≠ lower accuracy, if architecture improves** : the task got 3× harder but accuracy held steady, which would not have happened with a regular LSTM.
+3. **The 53% test-to-real-world gap has identifiable causes** : it's not random noise; it's 2D/3D limitations, occlusion, visual similarity, and domain shift. Each cause points to a specific fix.
+4. **Sign distinctiveness remains the dominant factor** : the 8 reliable signs (arm, brother, bed, bye, find, apple, blue, any) all have visually unique, primarily planar movements with no face contact.
+5. **225 features is increasingly suspected as the problem** : pose landmarks add noise without adding useful information for distinguishing signs. The PopSign paper used hands-only features (63). This became the primary hypothesis to test in V5 and V6.
+6. **Top-3 accuracy is much better than top-1** : the correct sign appears in the top 3 predictions far more often than it ranks first. This suggested that better features, not a fundamentally broken model, was the path to improvement.
+
+---
+
+## What Changed in V5
+
+The analysis here directly motivated V5's design:
+
+- **Transformer architecture** : testing whether attention mechanisms further improve on BiLSTM
+- **Focus on sign selection** : prioritising visually distinctive signs over broad vocabulary coverage
+
+[Continue to Version 5 →](../v5-popsign-transformer/V5_README.md)
