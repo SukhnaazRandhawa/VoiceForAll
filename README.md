@@ -62,8 +62,8 @@ FinalProject/
 
 | Version | Architecture | Dataset | Features | Signs | Test Accuracy | Real-World |
 |---|---|---|---|---|---|---|
-| [V1](versions/v1-lstm-baseline/V1_README.md) | Regular LSTM | WLASL-2000 | 225 | 20 | ~60% | Limited |
-| [V2](versions/v2-transformer/V2_README.md) | Transformer | WLASL-2000 | 225 | 20 | ~62% | Limited |
+| [V1](versions/v1-lstm-baseline/V1_README.md) | Regular LSTM | WLASL-2000 | 225 | 20 | ~96% | Limited |
+| [V2](versions/v2-transformer/V2_README.md) | Transformer | WLASL-2000 | 225 | 20 | ~81% | Limited |
 | [V3](versions/v3-popsign-lstm/V3_README.md) | Regular LSTM | PopSign ASL v1.0 | 225 | 13 | 72.80% | 54% |
 | [V4](versions/v4-popsign-bilstm/V4_README.md) | Bidirectional LSTM | PopSign ASL v1.0 | 225 | 42 | 72.63% | 19% |
 | [V5](versions/v5-popsign-transformer/V5_README.md) | Enhanced Transformer | PopSign ASL v1.0 | 225 | 42 | 70.80% | 24% |
@@ -85,7 +85,7 @@ The explanation: pose landmarks (shoulder position, torso orientation, head posi
 
 ## Key Learnings Across All Versions
 
-**V1 → V2:** Transformers did not outperform LSTMs on this task with small data. The self-attention mechanism needs sufficient sequence length and data volume to show its advantage. WLASL-2000 data leakage also inflated early results.
+**V1 → V2:** Transformers outperformed LSTMs on WLASL (81% vs 57% honest baseline), a genuine architectural improvement. However, strong test accuracy still did not translate to reliable real-world webcam performance, suggesting the bottleneck was the input representation, not the architecture.
 
 **V2 → V3:** Switching from WLASL to the PopSign dataset (NeurIPS 2023) dramatically improved data quality and real-world relevance. The dataset was recorded on smartphones by 47 deaf signers, much closer to real deployment conditions.
 
@@ -140,7 +140,7 @@ python test_webcam_sentences.py
 
 - 250 ASL signs recorded via smartphones
 - 47 deaf signers across diverse demographics
-- ~94,477 videos total; 248 signs used in V6
+- ~110,540 videos total; 248 signs used in V6
 - Available at: https://signdata.cc.gatech.edu/
 
 This dataset was chosen because it was recorded in naturalistic conditions by actual deaf signers using smartphones  conditions that closely match real-world deployment on a laptop webcam.

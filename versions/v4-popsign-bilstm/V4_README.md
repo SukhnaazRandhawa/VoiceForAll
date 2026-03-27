@@ -289,7 +289,7 @@ This is also why the random train/test split produces optimistic results: the sa
 2. **More signs ≠ lower accuracy, if architecture improves** : the task got 3× harder but accuracy held steady, which would not have happened with a regular LSTM.
 3. **The 53% test-to-real-world gap has identifiable causes** : it's not random noise; it's 2D/3D limitations, occlusion, visual similarity, and domain shift. Each cause points to a specific fix.
 4. **Sign distinctiveness remains the dominant factor** : the 8 reliable signs (arm, brother, bed, bye, find, apple, blue, any) all have visually unique, primarily planar movements with no face contact.
-5. **225 features is increasingly suspected as the problem** : pose landmarks add noise without adding useful information for distinguishing signs. The PopSign paper used hands-only features (63). This became the primary hypothesis to test in V5 and V6.
+5. **225 features is increasingly suspected as the problem** : pose landmarks add noise without adding useful information for distinguishing signs. The PopSign paper used hands-only features (63). This became the primary hypothesis to test in V6.
 6. **Top-3 accuracy is much better than top-1** : the correct sign appears in the top 3 predictions far more often than it ranks first. This suggested that better features, not a fundamentally broken model, was the path to improvement.
 
 ---
@@ -299,6 +299,5 @@ This is also why the random train/test split produces optimistic results: the sa
 The analysis here directly motivated V5's design:
 
 - **Transformer architecture** : testing whether attention mechanisms further improve on BiLSTM
-- **Focus on sign selection** : prioritising visually distinctive signs over broad vocabulary coverage
 
 [Continue to Version 5 →](../v5-popsign-transformer/V5_README.md)

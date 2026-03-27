@@ -351,7 +351,7 @@ V3 used none of these. The gap between 72.80% and 84.2% pointed directly at what
 2. **Sign distinctiveness is the dominant factor** : a sign with 300 training examples but a unique visual form (arm) outperformed signs with 550 examples but ambiguous motions (another, alligator).
 3. **The paper's methodology matters** : the PopSign paper's specific choices (BiLSTM, hand-only features, left-hand mirroring) weren't arbitrary; each one addresses a real generalisation problem.
 4. **Manual recording outperforms rolling buffer** : giving the model a clean, complete sign to evaluate is more reliable than hoping the automatic trigger captures the right 40-frame window.
-5. **225 features may be too many** : pose landmarks add noise for signs that primarily differ in hand shape and movement; hands-only features (63) became the hypothesis to test in V4.
+5. **225 features may be too many** : pose landmarks add noise for signs that primarily differ in hand shape and movement; hands-only features (63) became the hypothesis to test in future versions.
 
 ---
 
@@ -360,9 +360,8 @@ V3 used none of these. The gap between 72.80% and 84.2% pointed directly at what
 The findings here directly shaped V4's design:
 
 - **Bidirectional LSTM** : to match the paper's architecture
-- **Hands-only features (63)** : removing pose landmarks to reduce noise
-- **Left-hand mirroring** : normalising left-handed signs to right-hand perspective
-- **Expanded vocabulary** : moving toward more signs with better feature selection
+- **225 features retained** : architecture kept as the only variable changing from V3
+- **Expanded vocabulary** : scaling from 13 to 42 signs to test the BiLSTM at a more realistic scale
 
 [Continue to Version 4 →](../v4-popsign-bilstm/V4_README.md)
 
