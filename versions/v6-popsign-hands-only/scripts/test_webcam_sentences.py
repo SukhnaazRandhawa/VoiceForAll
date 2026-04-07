@@ -14,6 +14,7 @@ LABEL_MAP_PATH = "../data/label_map_hands_only_248.npy"
 MAX_FRAMES = 60
 MIN_FRAMES = 10
 MIN_CONFIDENCE = 0.30
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_MODEL = "llama3.2"
 
 # UI COLORS (BGR format)
@@ -187,7 +188,7 @@ def speak_sentence(sentence):
 
 def check_ollama_running():
     try:
-        response = requests.get('http://localhost:11434/api/tags', timeout=2)
+        response = requests.get(f'{OLLAMA_HOST}/api/tags', timeout=2)
         return response.status_code == 200
     except:
         return False
@@ -240,7 +241,7 @@ Your sentence:"""
 
     try:
         response = requests.post(
-            'http://localhost:11434/api/generate',
+            f'{OLLAMA_HOST}/api/generate',
             json={
                 'model': OLLAMA_MODEL,
                 'prompt': prompt,

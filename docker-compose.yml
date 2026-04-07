@@ -1,0 +1,23 @@
+services:
+
+  ollama:
+    image: ollama/ollama
+    container_name: voiceforall_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  inference:
+    build: .
+    container_name: voiceforall_inference
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    network_mode: host
+
+volumes:
+  ollama_data:
